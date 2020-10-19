@@ -34,7 +34,7 @@ When using your own scRNA-seq data to deconvolute your spatail transcriptomcis d
 * the raw scRNA-seq data matrix 
 * the raw spatial transcriptomics data matrix
 
-'''
+```
 cd DSTG
 Rscript convert_data.R --sc_data=scRNAseq_data  --st_data=spatial_data  
 python train.py # run DSTG
