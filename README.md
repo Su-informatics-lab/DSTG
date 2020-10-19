@@ -29,7 +29,7 @@ Rscript evaluation.R
 ```
 If you want to use your own scRNA-seq data to deconvolute your spatail transcriptomcis data, provide you data to script below:
 
-## Data
+## Run your own data
 When using your own scRNA-seq data to deconvolute your spatail transcriptomcis data, you have to provide 
 * the raw scRNA-seq data matrix 
 * the raw spatial transcriptomics data matrix
