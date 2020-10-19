@@ -38,7 +38,6 @@ When using your own scRNA-seq data to deconvolute your spatail transcriptomcis d
 cd DSTG
 Rscript convert_data.R --sc_data=scRNAseq_data  --st_data=spatial_data  
 python train.py # run DSTG
-
 ```
 Then you will get your results in the DSTG_Result folder.
 
