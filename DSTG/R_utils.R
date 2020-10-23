@@ -128,16 +128,35 @@ select_feature <- function(data,label,nf=2000){
     return (egen)
 }
 
-#' This function takes pseudo-spatail and real-spatial data to identify variable genes
+
+#' This function takes pseudo-spatail and real-spatial data to identify variable genes                                                                                             
 data_process <- function(st_count,st_label,anova){
     if (anova){
         sel.features <- select_feature(st_count[[1]],st_label[[1]])
-        st_count_new <- list(st_count[[1]][sel.features,],st_count[[2]][sel.features,]) } else {
-        st_count_new <- st_count }
-    res1 <- normalize_data(st_count)
-    st_norm <- res1[[1]]; variable_gene <- res1[[2]]; 
-    st_scale <- scale_data(st_count_new,st_norm,variable_gene)
-    return (list(st_count_new,st_norm,st_scale,variable_gene))
+        st_count_new <- list(st_count[[1]][sel.features,],st_count[[2]][sel.features,])
+
+        colnames(st_label[[1]]) <- 'subclass'
+        tem.t1 <- Seurat::CreateSeuratObject(counts = st_count_new[[1]],meta.data=st_label[[1]]);
+        Seurat::Idents(object = tem.t1) <- tem.t1@meta.data$subclass
+
+        #' convert scRNA-seq data to pseudo-spatial data                                                                                                                           
+        test.spot.ls1<-SPOTlight::test_spot_fun(se_obj=tem.t1,clust_vr='subclass',n=1000);
+        test.spot.counts1 <- as.matrix(test.spot.ls1[[1]])
+        colnames(test.spot.counts1)<-paste("mixt",1:ncol(test.spot.counts1),sep="_");
+        test.spot.metadata1 <- test.spot.ls1[[2]]
+
+        st_counts <- list(test.spot.counts1,st_count_new[[2]])
+
+        st_labels[[1]] <- test.spot.metadata1
+        N1 <- ncol(st_counts[[1]]); N2 <- ncol(st_counts[[2]])
+        label.list2 <- do.call("rbind", rep(list(st_labels[[1]]), round(N2/N1)+1))[1:N2]
+        st_labels <- list(st_label[[1]],lable.list2)
+    } else {
+        st_counts <- st_count; st_labels=st_label }
+    res1 <- normalize_data(st_counts)
+    st_norm <- res1[[1]]; variable_gene <- res1[[2]];
+    st_scale <- scale_data(st_counts,st_norm,variable_gene)
+    return (list(st_counts,st_labels,st_norm,st_scale,variable_gene))
 }
 
 #' @param count.list list of pseudo-spatial data and real-spatial data, of which rows are genes and columns are cells
@@ -146,9 +165,10 @@ data_process <- function(st_count,st_label,anova){
 Convert_Data <- function(count.list,label.list,anova=TRUE){
     step1 <- data_process(st_count=count.list,st_label=label.list,anova)
     st.count <- step1[[1]];
-    st.norm <- step1[[2]];
-    st.scale <- step1[[3]];
-    variable.genes <- step1[[4]]
+    st.label <- step1[[2]];
+    st.norm <- step1[[3]];
+    st.scale <- step1[[4]];
+    variable.genes <- step1[[5]]
 
     #' create data folders
     dir.create('Datadir'); dir.create('Output'); dir.create('DSTG_Result')
