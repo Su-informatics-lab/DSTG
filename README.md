@@ -31,8 +31,8 @@ If you want to use your own scRNA-seq data to deconvolute your spatail transcrip
 
 ## Run your own data
 When using your own scRNA-seq data to deconvolute your spatail transcriptomcis data, you have to provide 
-* the raw scRNA-seq data matrix 
-* the raw spatial transcriptomics data matrix
+* the raw scRNA-seq data matrix and label, which are saved as .RDS format (e.g. 'scRNAseq_data.RDS' & 'scRNAseq_label.RDS')
+* the raw spatial transcriptomics data matrix saved as .RDS format (e.g. 'spatial_data.RDS')
 
 ```
 cd DSTG
@@ -47,4 +47,5 @@ Then you will get your results in the DSTG_Result folder.
 Please cite our paper if you use this code in your own work:
 
 ```
+J. Su, Q. Song, DSTG: Deconvoluting Spatial Transcriptomics Data through Graph-based Artificial Intelligence, bioRxiv, (2020) 
 ```
