@@ -1,3 +1,6 @@
+#!/usr/bin/env Rscript
+args = commandArgs(trailingOnly=TRUE)
+
 #' This functions takes sythetic data to test DSTG's performance
 
 #' @return This function returns files saved in folders "Datadir" & "Infor_Data"
