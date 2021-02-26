@@ -5,7 +5,7 @@ predict <- read.csv('./DSTG_Result/predict_output.csv',header=F)
 
 source('R_utils.R')
 
-jsd.score <- synthetic_performance(
+jsd.score <- JSD_performance(
     spots_true_composition = as.matrix(true),
     spots_predicted_composition = as.matrix(predict))
 
