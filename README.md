@@ -47,5 +47,5 @@ Then you will get your results in the DSTG_Result folder.
 Please cite our paper if you use this code in your own work:
 
 ```
-J. Su, Q. Song, DSTG: Deconvoluting Spatial Transcriptomics Data through Graph-based Artificial Intelligence, bioRxiv, (2020) 
+Qianqian Song, Jing Su, DSTG: deconvoluting spatial transcriptomics data through graph-based artificial intelligence, Briefings in Bioinformatics, 2021;, bbaa414, https://doi.org/10.1093/bib/bbaa414
 ```
