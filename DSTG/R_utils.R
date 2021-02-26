@@ -1,5 +1,5 @@
 #' evalaute performance
-synthetic_performance <- function(spots_true_composition, spots_predicted_composition) 
+JSD_performance <- function(spots_true_composition, spots_predicted_composition) 
 {
     suppressMessages(require(philentropy))
     jsd_matrix <- matrix(nrow = nrow(spots_true_composition), ncol = 1)
