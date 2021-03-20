@@ -108,7 +108,7 @@ data_process <- function(st_count,st_label,anova){
         st_labels[[1]] <- test.spot.metadata1
         N1 <- ncol(st_counts[[1]]); N2 <- ncol(st_counts[[2]])
         label.list2 <- do.call("rbind", rep(list(st_labels[[1]]), round(N2/N1)+1))[1:N2]
-        st_labels <- list(st_label[[1]],lable.list2)
+        st_labels <- list(st_label[[1]],label.list2)
     } else {
         st_counts <- st_count; st_labels=st_label }
     res1 <- normalize_data(st_counts)
