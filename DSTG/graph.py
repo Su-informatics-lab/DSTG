@@ -66,9 +66,11 @@ def Link_Graph(outputdir):
                        k_filter=100)
 
     graph1 = link1[0].iloc[:, 0:2].reset_index()
+    graph1 = graph1.iloc[:,1:3] 
     graph1.to_csv('./Datadir/Linked_graph1.csv')
 
     graph2 = link2[0].iloc[:, 0:2].reset_index()
+    graph2 = graph2.iloc[:,1:3]
     graph2.to_csv('./Datadir/Linked_graph2.csv')
 
     label1 = label_list[0]
