@@ -11,7 +11,7 @@ source('R_utils.R')
 #' if you have the scRNA-seq data and want to decompose ST data, plese run below:
 
 if (length(args)==0) {
-    message('run sythetic data...')
+    message('run synthetic data...')
     synthetic.count <- readRDS('./synthetic_data/example_data.RDS')
     synthetic.label <- readRDS('./synthetic_data/example_label.RDS')
     Convert_Data(synthetic.count,synthetic.label,anova=FALSE)
