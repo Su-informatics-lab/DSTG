@@ -8,7 +8,6 @@ from collections import defaultdict
 from scipy.stats import uniform
 from data import *
 
-
 def load_data(datadir):
     input_data(datadir)
     PIK = "{}/datasets.dat".format(datadir)
@@ -32,18 +31,13 @@ def load_data(datadir):
     datas_tr = scipy.sparse.csr_matrix(datas_train.astype('Float64'))
     datas_va = scipy.sparse.csr_matrix(datas_val.astype('Float64'))
     datas_te = scipy.sparse.csr_matrix(datas_test.astype('Float64'))
-
-    #' 3) set the unlabeled data in training set
-
-    #' @param N; the number of labeled samples in training set
+    
     M = len(data_train1)
 
     #' 4) get the feature object by combining training, test, valiation sets
-
     features = sp.vstack((sp.vstack((datas_tr, datas_va)), datas_te)).tolil()
     features = preprocess_features(features)
 
-    #' 5) Given cell type, generate three sets of labels with the same dimension
     labels_tr = labels_train
     labels_va = labels_val
     labels_te = labels_test
@@ -75,8 +69,7 @@ def load_data(datadir):
     labels_binary_val[val_mask, :] = new_label[val_mask, :]
     labels_binary_test[test_mask, :] = new_label[test_mask, :]
 
-    #' ----- construct adjacent matrix ---------
-
+    #' construct adjacent matrix
     id_graph1 = pd.read_csv('{}/Linked_graph1.csv'.format(datadir),
                             index_col=0,
                             sep=',')
@@ -84,7 +77,7 @@ def load_data(datadir):
                             sep=',',
                             index_col=0)
 
-    #' --- map index ----
+    #' map index 
     fake1 = np.array([-1] * len(lab_data2.index))
     index1 = np.concatenate((data_train1.index, fake1, data_val1.index,
                              data_test1.index)).flatten()
@@ -93,9 +86,7 @@ def load_data(datadir):
     fake3 = np.array([-1] * (len(data_val1) + len(data_test1)))
     find1 = np.concatenate((fake2, np.array(lab_data2.index), fake3)).flatten()
 
-    #' ---------------------------------------------
-    #'  intra-graph
-    #' ---------------------------------------------
+    #'  link graph 2
     id_grp1 = np.array([
         np.concatenate((np.where(find1 == id_graph2.iloc[i, 1])[0],
                         np.where(find1 == id_graph2.iloc[i, 0])[0]))
@@ -108,9 +99,7 @@ def load_data(datadir):
         for i in range(len(id_graph2))
     ])
 
-    #' ---------------------------------------------
-    #'  inter-graph
-    #' ---------------------------------------------
+    #'  link graph 1
     id_gp1 = np.array([
         np.concatenate((np.where(find1 == id_graph1.iloc[i, 1])[0],
                         np.where(index1 == id_graph1.iloc[i, 0])[0]))
