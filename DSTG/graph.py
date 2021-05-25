@@ -54,9 +54,30 @@ def Link_Graph(outputdir):
                        features=features,
                        combine=combine)
 
-    count_list2 = [count_list[1], count_list[1]]
-    norm_list2 = [norm_list[1], norm_list[1]]
-    scale_list2 = [scale_list[1], scale_list[1]]
+     #' ---- input data for link grpah 2 -----
+    files1 = glob.glob(path0 + "/ST_count/*.csv")
+    files1.sort()
+    tem_count = pd.read_csv(files1[1], index_col=0)
+    tem_count.columns = tem_count.columns.str.replace("mixt_", "rept_")
+
+    files2 = glob.glob(path0 + "/ST_norm/*.csv")
+    files2.sort()
+    tem_norm = pd.read_csv(files2[1], index_col=0)
+    tem_norm.columns = tem_norm.columns.str.replace("mixt_", "rept_")
+
+    files3 = glob.glob(path0 + "/ST_scale/*.csv")
+    files3.sort()
+    tem_scale = pd.read_csv(files3[1], index_col=0)
+    tem_scale.columns = tem_scale.columns.str.replace("mixt_", "rept_")
+
+    files4 = glob.glob(path0 + "/ST_label/*.csv")
+    files4.sort()
+    tem_label = pd.read_csv(files4[1], index_col=0)
+    tem_label.columns = tem_label.columns.str.replace("mixt_", "rept_")
+
+    count_list2 = [count_list[1],tem_count]
+    norm_list2 = [norm_list[1], tem_norm]
+    scale_list2 = [scale_list[1], tem_scale]
 
     link2 = Link_graph(count_list=count_list2,
                        norm_list=norm_list2,
