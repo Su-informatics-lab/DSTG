@@ -73,9 +73,6 @@ def load_data(datadir):
     id_graph1 = pd.read_csv('{}/Linked_graph1.csv'.format(datadir),
                             index_col=0,
                             sep=',')
-    id_graph2 = pd.read_csv('{}/Linked_graph2.csv'.format(datadir),
-                            sep=',',
-                            index_col=0)
 
     #' map index 
     fake1 = np.array([-1] * len(lab_data2.index))
@@ -86,39 +83,19 @@ def load_data(datadir):
     fake3 = np.array([-1] * (len(data_val1) + len(data_test1)))
     find1 = np.concatenate((fake2, np.array(lab_data2.index), fake3)).flatten()
 
-    #'  link graph 2
-    id_grp1 = np.array([
-        np.concatenate((np.where(find1 == id_graph2.iloc[i, 1])[0],
-                        np.where(find1 == id_graph2.iloc[i, 0])[0]))
-        for i in range(len(id_graph2))
-    ])
+    row1 = [np.where(find1 == id_graph1.iloc[i, 1])[0][0]
+	for i in range(len(id_graph1))
+    ]
+    col1 = [np.where(index1 == id_graph1.iloc[i, 0])[0][0]
+	for i in range(len(id_graph1))
+    ]
+    adj = defaultdict(list)  # default value of int is 0                                                                                                                               
+    for i in range(len(labels)):
+        adj[i].append(i)
+    for i in range(len(row1)):
+        adj[row1[i]].append(col1[i])
+        adj[col1[i]].append(row1[i])
 
-    id_grp2 = np.array([
-        np.concatenate((np.where(find1 == id_graph2.iloc[i, 0])[0],
-                        np.where(find1 == id_graph2.iloc[i, 1])[0]))
-        for i in range(len(id_graph2))
-    ])
-
-    #'  link graph 1
-    id_gp1 = np.array([
-        np.concatenate((np.where(find1 == id_graph1.iloc[i, 1])[0],
-                        np.where(index1 == id_graph1.iloc[i, 0])[0]))
-        for i in range(len(id_graph1))
-    ])
-
-    id_gp2 = np.array([
-        np.concatenate((np.where(index1 == id_graph1.iloc[i, 0])[0],
-                        np.where(find1 == id_graph1.iloc[i, 1])[0]))
-        for i in range(len(id_graph1))
-    ])
-
-    matrix = np.identity(len(labels))
-    matrix[tuple(id_grp1.T)] = 1
-    matrix[tuple(id_grp2.T)] = 1
-    matrix[tuple(id_gp1.T)] = 1
-    matrix[tuple(id_gp2.T)] = 1
-
-    adj = graph(matrix)
     adj = nx.adjacency_matrix(nx.from_dict_of_lists(adj))
 
     print("assign input coordinatly....")
