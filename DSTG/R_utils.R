@@ -101,8 +101,8 @@ data_process <- function(st_count,st_label,anova){
         test.spot.ls1<-SPOTlight::test_spot_fun(se_obj=tem.t1,clust_vr='subclass',n=1000);
         test.spot.counts1 <- as.matrix(test.spot.ls1[[1]])
         colnames(test.spot.counts1)<-paste("mixt",1:ncol(test.spot.counts1),sep="_");
-        test.spot.metadata1 <- test.spot.ls1[[2]]
-
+        metadata1 <- test.spot.ls1[[2]]
+        test.spot.metadata1 <- do.call(rbind,lapply(1:nrow(metadata1),function(i){metadata1[i,]/sum(metadata1[i,])}))
         st_counts <- list(test.spot.counts1,st_count_new[[2]])
 
         st_label[[1]] <- test.spot.metadata1
@@ -146,7 +146,7 @@ Convert_Data <- function(count.list,label.list,anova=TRUE){
     
     for (i in 1:2){
         write.csv(st.count[[i]],file=paste0(inforDir,'/ST_count/ST_count_',i,'.csv'),quote=F)
-        write.csv(label.list[[i]],file=paste0(inforDir,'/ST_label/ST_label_',i,'.csv'),quote=F)
+        write.csv(st.label[[i]],file=paste0(inforDir,'/ST_label/ST_label_',i,'.csv'),quote=F)
         write.csv(st.norm[[i]],file=paste0(inforDir,'/ST_norm/ST_norm_',i,'.csv'),quote=F)
         write.csv(st.scale[[i]],file=paste0(inforDir,'/ST_scale/ST_scale_',i,'.csv'),quote=F)
     }
