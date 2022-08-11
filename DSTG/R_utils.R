@@ -154,5 +154,77 @@ Convert_Data <- function(count.list,label.list,anova=TRUE){
 
 
 
+# se_obj is a seurat object.
+
+test_spot_fun = function (se_obj, clust_vr, n = 1000, verbose = TRUE){
+  if (is(se_obj) != "Seurat") 
+    stop("ERROR: se_obj must be a Seurat object!")
+  if (!is.character(clust_vr)) 
+    stop("ERROR: clust_vr must be a character string!")
+  if (!is.numeric(n)) 
+    stop("ERROR: n must be an integer!")
+  if (!is.logical(verbose)) 
+    stop("ERROR: verbose must be a logical object!")
+  suppressMessages(require(DropletUtils))
+  suppressMessages(require(purrr))
+  suppressMessages(require(dplyr))
+  suppressMessages(require(tidyr))
+  se_obj@meta.data[, clust_vr] <- gsub(pattern = "[[:punct:]]|[[:blank:]]", 
+                                       ".", x = se_obj@meta.data[, clust_vr], perl = TRUE)
+  print("Generating synthetic test spots...")
+  start_gen <- Sys.time()
+  pb <- txtProgressBar(min = 0, max = n, style = 3)
+  count_mtrx <- as.matrix(se_obj@assays$RNA@counts)
+  ds_spots <- lapply(seq_len(n), function(i) {
+    cell_pool <- sample(colnames(count_mtrx), sample(x = 2:10, 
+                                                     size = 1))
+    pos <- which(colnames(count_mtrx) %in% cell_pool)
+    tmp_ds <- se_obj@meta.data[pos, ] %>% mutate(weight = 1)
+    name_simp <- paste("spot_", i, sep = "")
+    spot_ds <- tmp_ds %>% dplyr::select(all_of(clust_vr), 
+                                        weight) %>% dplyr::group_by(!!sym(clust_vr)) %>% 
+      dplyr::summarise(sum_weights = sum(weight)) %>% dplyr::ungroup() %>% 
+      tidyr::pivot_wider(names_from = all_of(clust_vr), 
+                         values_from = sum_weights) %>% dplyr::mutate(name = name_simp)
+    syn_spot <- rowSums(as.matrix(count_mtrx[, cell_pool]))
+    sum(syn_spot)
+    names_genes <- names(syn_spot)
+    if (sum(syn_spot) > 25000) {
+      syn_spot_sparse <- DropletUtils::downsampleMatrix(Matrix::Matrix(syn_spot, 
+                                                                       sparse = T), prop = 20000/sum(syn_spot))
+    }
+    else {
+      syn_spot_sparse <- Matrix::Matrix(syn_spot, sparse = T)
+    }
+    rownames(syn_spot_sparse) <- names_genes
+    colnames(syn_spot_sparse) <- name_simp
+    setTxtProgressBar(pb, i)
+    return(list(syn_spot_sparse, spot_ds))
+  })
+  ds_syn_spots <- purrr::map(ds_spots, 1) %>% base::Reduce(function(m1, 
+                                                                    m2) cbind(unlist(m1), unlist(m2)), .)
+  ds_spots_metadata <- purrr::map(ds_spots, 2) %>% dplyr::bind_rows() %>% 
+    data.frame()
+  ds_spots_metadata[is.na(ds_spots_metadata)] <- 0
+  lev_mod <- gsub("[\\+|\\ |\\/]", ".", unique(se_obj@meta.data[, 
+                                                                clust_vr]))
+  colnames(ds_spots_metadata) <- gsub("[\\+|\\ |\\/]", ".", 
+                                      colnames(ds_spots_metadata))
+  if (sum(lev_mod %in% colnames(ds_spots_metadata)) == (length(unique(se_obj@meta.data[, 
+                                                                                       clust_vr])) + 1)) {
+    ds_spots_metadata <- ds_spots_metadata[, lev_mod]
+  }
+  else {
+    missing_cols <- lev_mod[which(!lev_mod %in% colnames(ds_spots_metadata))]
+    ds_spots_metadata[missing_cols] <- 0
+    ds_spots_metadata <- ds_spots_metadata[, lev_mod]
+  }
+  close(pb)
+  print(sprintf("Generation of %s test spots took %s mins", 
+                n, round(difftime(Sys.time(), start_gen, units = "mins"), 
+                         2)))
+  print("output consists of a list with two dataframes, this first one has the weighted count matrix and the second has the metadata for each spot")
+  return(list(topic_profiles = ds_syn_spots, cell_composition = ds_spots_metadata))
+}
 
 
